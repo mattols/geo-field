@@ -70,8 +70,8 @@ points(0, 0, pch = 3, col = "gray", cex = 1.2)
 legend("topright",                        # position (can also use "bottomleft", etc.)
        legend = c("\u03C3 (68%)", "2\u03C3 (95%)"),  # labels with sigma symbol
        col = c("firebrick", "orange3"),          # matching colors
-       lwd = 2,                           # line width
-       lty = 2,                     # line type: solid and dashed
+       lwd = 2,                           # line width: x2
+       lty = 2,                     # line type: dashed
        bty = "n")                         # no box around the legend
 
 legend("bottomright",
