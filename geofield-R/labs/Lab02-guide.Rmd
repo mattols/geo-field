@@ -436,6 +436,121 @@ There are **two options** for the next step:
 ___
 
 
+
+
+
+
+Absolutely — the original questions are written in a very technical and compact way. Here’s a rewritten version that’s clearer, more structured, and easier to follow while keeping the technical depth.
+
+---
+
+## 🔍 **Rewritten Version of the Problem Sets**
+
+---
+
+### **Problem A: UTM Distortion and Plant Survey**
+
+Imagine you're working on two field projects in **UTM Zone 12**, using UTM (Universal Transverse Mercator) coordinates. In both cases, you're walking along an **east-west path that is 1 km long**, and you're counting the number of **Great Basin Sagebrush** plants that are within 10 meters of your path.
+
+* The first project is located at an **easting of 500,000 meters** (which is at the center of UTM Zone 12).
+* The second project is located at an **easting of 750,000 meters** (closer to the edge of the zone, where distortion is more noticeable).
+
+You're trying to understand whether the **UTM projection distortion** will significantly affect your measurements.
+
+---
+
+#### **A1. How much distortion is there at each location?**
+
+* Look up (online or from lecture notes) the **UTM scale factor** at:
+
+  * The **center of the zone** (500,000 m easting).
+  * The **edge of the zone** (750,000 m easting).
+* These scale factors tell you how much the UTM projection **shrinks or stretches** distances compared to real-world ground distances.
+
+---
+
+#### **A2. How does this distortion affect your plant density calculation?**
+
+* You’re measuring plant density as:
+
+  $$
+  \text{Plant Density} = \frac{\text{Number of Plants}}{1\, \text{km}}
+  $$
+
+* But due to UTM distortion, your **actual walking distance on the ground** may be slightly more or less than 1 km.
+
+* Use the scale factors you found in A1 to calculate:
+
+  * The **actual ground distance** of your 1 km traverse.
+  * The **true plant density**, based on this corrected distance.
+
+* Then calculate the **ratio of apparent to actual plant density** to find out how much error UTM distortion introduces.
+
+---
+
+#### **A3. Is this error important?**
+
+* Based on your calculations, is the distortion large enough to affect your study results in a meaningful way?
+* Consider the **size of the error** compared to natural variability in plant counts.
+
+---
+
+### **Problem B: Plate Motion and Coordinate Systems**
+
+Now imagine a second situation involving plate tectonics.
+
+You and a colleague are measuring the distance between two fixed points on the Earth’s surface, which are moving slowly over time due to **tectonic motion**.
+
+* **Two years ago**, you measured the distance as **exactly 1,000.000 meters**, using the **IGS08 geodetic coordinate system** (which is very accurate for tracking global positions).
+* **This year**, your colleague measured the same two points again, but used **UTM Zone 12 coordinates** instead.
+
+---
+
+#### **B1. How much could UTM distortion affect the measurement?**
+
+* Based on your understanding of UTM distortion (from Problem A), how much **error** might your colleague’s measurement include just because they used UTM instead of IGS08?
+
+---
+
+#### **B2. How does that compare to actual tectonic motion?**
+
+* How far apart might the two points **really have moved** in the past two years due to plate tectonics?
+* Use a typical plate motion speed (e.g., **2.5 cm/year**) to estimate the expected tectonic shift.
+* Then compare this tectonic shift to the possible error introduced by using UTM.
+
+---
+
+## ✅ Summary
+
+This version:
+
+* Breaks the problem into clear steps.
+* Uses simple and consistent wording.
+* Clarifies the difference between coordinate distortion and real-world movement.
+
+Let me know if you'd like a worksheet-style version or a visual to go with it!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <br>
 <br>
 
