@@ -1,0 +1,294 @@
+---
+title: "Lab 02 GUide"
+author: "GEOG 4100"
+output: html_document
+---
+
+### **Learning Outcomes**
+
+1. **Understand the basics of the R language** 
+2. **Develop a better understanding of geodesy concepts**
+3. **Apply mathematical concepts to geographic data**
+4. **Transform positions between horizontal reference frames**
+5. **Explore spatial data handling and visualization in R or ArcGIS Pro**
+
+
+
+### **A Brief Introduction to R**
+
+R is a free software environment used for statistical computing and graphics. It is very useful for analyzing data, including geographic information, because it can handle numbers, tables, and even geographic coordinates and map projections easily.
+
+You can download R for free from: 
+
+* CRAN: [https://cran.r-project.org/](https://cran.r-project.org/). 
+* After installing R, you can also install RStudio, which is a user-friendly interface for R, from [https://posit.co/download/rstudio-desktop/](https://posit.co/download/rstudio-desktop/).
+
+**Lab computers should have R & RStudio pre-installed**
+
+| > **Open RStudio**
+
+In the console, copy and paste this code:
+
+```r
+print("hello geospatial world!")
+```
+
+click `enter` to run the code.
+
+Great work! You ran your first bit of code.
+
+Below we will cover a few important operations in R to help with this weeks assignment. **Prior programming experience is NOT necessary to complete this assignment!**
+
+<br>
+
+___
+
+#### **R Basics:** Arithmetic, Variables, Tables, and Matrices
+
+R can be used like a calculator:
+
+```r
+2 + 3  # adds two numbers
+5 * 4  # multiplies two numbers
+```
+
+You can store values in variables to use in equations:
+
+```r
+x <- 10
+y <- 5
+z <- x + y  # z is now 15
+```
+
+Tables, arrays, and matrices store data in rows and columns, you can use the following functions to create a data structure:
+
+```r
+# Create an array (numbers in a sequence)
+my_array <- c(1, 2, 3, 4, 5)
+
+# Create a table (similar to data frame)
+my_table <- data.frame(Name = c("A", "B"), Value = c(3, 7))
+
+# Create a matrix
+my_matrix <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2)
+```
+
+R includes many other useful **built-in functions** for statistical analysis. Here are three commonly used ones:
+
+* `mean()` – calculates the **average**
+* `sd()` – calculates the **standard deviation**
+* `sum()` – adds all the values
+
+Here is an example of how these can be used:
+
+```r
+numbers <- c(5, 10, 15, 20)
+
+mean(numbers)  # returns 12.5
+sd(numbers)    # returns 6.454972
+sum(numbers)   # returns 50
+```
+
+These functions make it easy to quickly summarize and understand your data.
+
+Finally, we should cover how to subset data for more flexible use. In R, **indexing** means accessing specific elements from a vector, matrix, or other data structure.
+
+You can access elements of a vector using square brackets:
+
+```r
+v <- c(10, 20, 30, 40)
+v[1]     # returns 10 (first element)
+v[3]     # returns 30 (third element)
+```
+
+Matrices use two indices: `[row, column]`
+
+```r
+m <- matrix(1:9, nrow = 3, byrow = TRUE)
+m[1, 2]  # element in first row, second column
+m[3, ]   # entire third row
+m[, 1]   # entire first column
+```
+
+Indexing helps you extract or modify parts of your data for analysis.
+
+For example, if you wanted to take the average and standard devaition of separate columns in a matrix, you could do the following:
+
+```r
+# combine indexing and functions
+mean(m[, 1])  # the mean value of the first matrix column
+sd(m[, 2])    # the standard deviation of the second column
+```
+Additional functions can speed this process up, such as `apply`, but these are not necessary for this lab.
+
+**R is like Excel**, only much more flexible, more useful, and much more powerful in the long run. Students should learn to use this valuable tool.
+
+
+___
+
+#### **R Basics:** Reading and Plotting Point Data
+
+Here is how to create a simple matrix with two points (x, y) and plot them:
+
+```r
+points <- matrix(c(1, 2, 3, 4), ncol = 2, byrow = TRUE)  # two points: (1,2) and (3,4)
+colnames(points) <- c("x", "y")
+
+plot(points, xlab = "X Coordinate", ylab = "Y Coordinate", main = "Simple Plot of Points")
+
+# or with individual variables
+x <- c(1, 3)
+y <- c(2,4)
+plot(x, y)
+```
+
+See more with the `?plot` function.
+
+___
+
+#### **R Basics:** Annotating Code and Saving Files and Code
+
+Comments help explain your code and start with `#`:
+
+```r
+# This calculates the sum of two numbers
+a <- 5
+b <- 7
+sum <- a + b  # sum equals 12
+```
+
+These lines will not be run and are intended to help you and others understand what is going on.
+
+An **R script** is a plain text file that contains a series of R commands. The file usually ends in `.R`. You can open and edit R scripts in RStudio or any text editor.
+
+Using an R script is helpful because:
+
+* It **saves your work**, so you don’t have to retype commands every time.
+* You can **run your code in parts**, making it easier to test and debug.
+* It helps you **stay organized** by keeping all your analysis steps in one place.
+* You can **add comments** (using `#`) to explain what each section of your code does.
+
+To create an R script in **RStudio**:
+
+1. Go to the top menu and click `File` → `New File` → `R Script`.
+2. Save the file using `File` → `Save` (use `.R` as the file extension).
+3. You can run a line or section of code by highlighting it and pressing **Ctrl + Enter** (or **Cmd + Enter** on Mac).
+
+
+___
+
+After creating or modifying data in R, you may want to save it so you can use it later or share it with others. One common format for saving data is **CSV (Comma-Separated Values)**, which can be opened by many programs like Excel.
+
+To save a table or data frame as a CSV file, use the `write.csv()` function:
+
+```r
+# Create a simple data frame
+my_data <- data.frame(Name = c("Alice", "Bob"), Score = c(90, 85))
+
+# Save it as a CSV file named "my_data.csv"
+write.csv(my_data, file = "my_data.csv", row.names = FALSE)
+```
+
+* `file` specifies the name of the file to save.
+* `row.names = FALSE` prevents R from adding row numbers as a separate column.
+
+This file will be saved in your current working directory, which you can check with `getwd()` or change with `setwd()`. You can also specify another path in the filename. 
+
+You can read in tabular data with `read.csv(csv_filename)` or `read.table` for other specific tabular files.
+
+
+___
+#### **R Basics:** Other functions
+
+In R, you can add extra tools called packages. Packages extend R’s capabilities for specific tasks like mapping or data analysis. To install a package, use:
+
+```r
+install.packages("packageName")
+```
+
+And to use it in your code, load it with:
+
+```r
+library(packageName)
+```
+
+This is one of the greatest advantages that R (and other open-source programming languages) have over ArcGIS Pro.
+
+*One Final Note:*
+
+In general, R is similar in capabilities and functionality to Matlab, Python, Julia, and other programming software. There is no *best* programming language to learn, all have their strengths. In today's geospatial world, the most important  thing is that you learn *some* bit of programming to keep up with this rapidly evolving field! It is also useful in many other settings.
+
+<br>
+
+## **Section 1:** Shape of the Earth and Ellipsoid
+
+Important vocabulary:
+
+| Term      | Explanation                                                              |
+| _________ | ________________________________________________________________________ |
+| Datum     | Reference point or surface for measuring locations on Earth.             |
+| Ellipsoid | A mathematically defined, smooth shape approximating Earth's shape.      |
+| Geoid     | The shape of Earth's mean sea level, used as a vertical reference.       |
+| GCS       | Geographic Coordinate System, using latitude and longitude.              |
+| WGS84     | A global datum and coordinate system used by GPS.                        |
+| NAD       | North American Datum, used mainly in North America (e.g., NAD27, NAD83). |
+| PCS       | Projected Coordinate System, converting 3D Earth to flat maps.           |
+| UTM       | Universal Transverse Mercator, a common projected coordinate system.     |
+
+<br>
+
+___
+
+The Earth is not a perfect sphere but an ellipsoid, slightly flattened at the poles. The **semi-major axis** is the longest diameter of the ellipsoid, stretching from the center to the surface at the equator. This is a key parameter in most Earth models like **WGS84** and **GRS80**. The **semi-minor axis** is the shorter diameter, with a radius from the center to a pole.
+
+
+For example, the **GRS80 ellipsoid** (used to define NAD83) has the following properties:
+
+* Semimajor axis (equatorial radius): **6,378,137 meters**
+* Flattening (f): **1 / 298.257222101**
+
+
+Flattening is calculated as:
+
+$$
+f = \frac{a - b}{a}
+$$
+
+where:
+
+* $a$ = semimajor axis
+* $b$ = semiminor axis (polar radius)
+
+Note that you can use the information above to find information about the semi-minor axis and the difference between the two axes for an ellipsoid. 
+
+**Purpose:** You will respond to a few questions about the ellipsoid in this assignment.
+
+<br>
+
+___
+
+## **Section 2:** Calculating Distance with Pythagorean Theorem
+
+When working with points on a flat surface (like a map or a local projected coordinate system), we can measure the straight-line distance between two points using the **Pythagorean Theorem**. If you know the coordinates of two points — say, $(x_1, y_1)$ and $(x_2, y_2)$ — the distance between them is the length of the hypotenuse of a right triangle. The formula is:
+
+$$
+\text{distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+$$
+
+This method works well for **short distances** or in **planar coordinate systems** like UTM, but it becomes less accurate for long distances on the curved surface of the Earth (where spherical or ellipsoidal formulas are used instead).
+
+Example in R:
+
+```r
+x1 <- 1; y1 <- 2
+x2 <- 4; y2 <- 6
+distance <- sqrt((x2 - x1)^2 + (y2 - y1)^2)
+distance
+```
+Note that `sqrt()` is a built-in R function to calculate the square root. You can look up help for any function by running `?` followed by the function name (e.g. `?sqrt`). You can also use the *Help* tab in the lower right window.
+
+**Purpose:** You will used this step to calculate the distance between your measured points.
+
+<br>
+
+
