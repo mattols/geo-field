@@ -21,7 +21,8 @@ colnames(p1) <- c("x", "y")
 
 plot(p1[,1],p1[,2], asp=1)
 apply(p1, 2, mean)
-apply(p1, 2, sd) / c(111123)
+# convert to meters
+apply(p1, 2, sd) * c(84963, 111319) # conversions
 
 # convert distances
 x_diff_m <- p1[,1] - apply(p1, 2, mean)[1] * 111132
@@ -130,16 +131,19 @@ library(terra)
 # Create points
 pc <- vect(matrix(c(-111.7153362, 40.27748851), ncol=2, 
                       byrow=TRUE), type="points")
+pc <- vect(matrix(mean_point, ncol=2), type="points", crs='epsg:4326')
 
 # Assign coordinate system information (WGS84)
 crs(points) <- "+proj=longlat +datum=WGS84 +no_defs"
 
 # Create points
 pp <- vect(p1, type="points")
+pp2 <- vect(p1, type="points")
 
 # Assign coordinate system information (WGS84)
-crs(pp) <- "+proj=longlat +datum=WGS84 +no_defs"
+# crs(pp) <- "+proj=longlat +datum=WGS84 +no_defs"
 crs(pp) <- "EPSG:4326"
+crs(pp2) <- 'EPSG:4269'
 # projection issues
 # pp2 = project(pp, "EPSG:2767") # this is projected
 # pp2 = project(pp, "EPSG:4269") # NAD83
@@ -147,6 +151,9 @@ crs(pp) <- "EPSG:4326"
 pp2 = project(pp, 'EPSG:6318') # NAD83 - 2011 North AMerican Fixed
 pp_igs = project(pp, 'EPSG:9014') # IGS08
 pp3=pp2;crs(pp3) = "EPSG:4326"
+
+# or
+pp3 = project(pp2, 'EPSG:4326')
 
 plot(pp)
 plot(pp2,col='green', add=T, pch=3)
@@ -156,12 +163,41 @@ geom(pp)
 geom(pp3)
 geom(pp_igs)
 
-plot(pp[3,], xlim=c(geom(pp[3,])[3]-0.00001, geom(pp[3,])[3]+0.00001), 
-     ylim=c(geom(pp[3,])[4]-0.00001, geom(pp[3,])[4]+0.00001))
-plot(pp3[3,],col='red', add=T, pch=3)
 
-formatC(geom(pp[3,]),digits=8)
-geom(pp3[3,])
+# define
+p1_wgs <- vect(p1, type="points", crs='epsg:4326') # WGS 84
+# incorrect
+p1_nad83_1 <- vect(p1, type="points", crs='epsg:4269') # NAD83 (1986) - oudated
+p1_nad83_2 <- vect(p1, type="points", crs='epsg:6783') # NAD83 (CORS96) 
+p1_nad83_3 <- vect(p1, type="points", crs='epsg:6318') # NAD83 (2011) - includes tectonic motion
+
+# project to same reference frame (still incorrect)
+p1_nad83_1 <- project(p1_nad83_1, 'epsg:4326')
+p1_nad83_2 <- project(p1_nad83_2, 'epsg:4326')
+p1_nad83_3 <- project(p1_nad83_3, 'epsg:4326')
+
+# distance
+distance(p1_wgs, p1_nad83_1, pairwise=T)
+distance(p1_wgs, p1_nad83_2, pairwise=T)
+distance(p1_wgs, p1_nad83_3, pairwise=T)
+
+
+nad83_1986_crs <- "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs"
+p1n <- vect(p1, type="points", crs=nad83_1986_crs)
+p1n <- project(p1n, 'epsg:4326')
+distance(p1_wgs, p1n, pairwise=T)
+
+# NO
+# https://www.ngs.noaa.gov/TOOLS/Htdp/HTDP-user-guide.pdf
+# nad83_2011_helmert <- '+proj=longlat +ellps=GRS80 +towgs84=1.00390,-1.90961,-0.54117,0.02678138,-0.00042027,0.01093206,-0.05109 +no_defs'
+nad83_2011_helmert <- "+proj=longlat +ellps=GRS80 +towgs84=1.004,-1.910,-0.541,0.02678,-0.00042,0.01093,-0.05109 +no_defs"
+p_nad83_2011 <- vect(p1, type="points", crs=nad83_2011_helmert)
+p_nad83_2011 <- project(p_nad83_2011, 'EPSG:4326')
+distance(p1_wgs, p_nad83_2011, pairwise=T)
+# differences of 2.95
+
+plot(p1_wgs)
+plot(p1n, add=T, col='red', pch=3)
 
 
 terra::crs(pp, describe=TRUE)
@@ -184,10 +220,16 @@ st_coordinates(pt_nad83)
 # Difference in meters using geodetic distance
 sf::st_distance(pt_wgs84, pt_nad83)
 
+################
+ponds1 = read.csv('~/Downloads/ponds1.csv')
+head(ponds1)
 
+tolower(gsub('[[:punct:]]', '', gsub('*._(.*)','', ponds1$Title) ))
+ponds1$Title = tolower(sub("^(.{2}).*$", "\\1", ponds1$Title))
 
+pd1 = ponds1[order(ponds1$Title),]
 
-
+write.csv(pd1, 'tmp-data/pond_measurements2023.csv', row.names = F)
 
 
 library(sf)

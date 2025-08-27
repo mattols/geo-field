@@ -6,17 +6,269 @@ output: html_document
 
 ### **Learning Outcomes**
 
-1. **Understand the basics of the R language** 
-2. **Develop a better understanding of geodesy concepts**
-3. **Apply mathematical concepts to geographic data**
-4. **Transform positions between horizontal reference frames**
-5. **Explore spatial data handling and visualization in R or ArcGIS Pro**
+1. **Develop a better understanding of geodesy concepts**
+2. **Apply mathematical concepts to geographic data**
+3. **Transform positions between horizontal reference frames**
+4. **Use R to explore numerical and geographic data** 
+
+<br>
+
+*Be sure to read all sections following the questions for essential information*
 
 <br>
 
 ___
 
-### **A Brief Introduction to R**
+## **Lab Questions:**
+
+This document contains a detailed guide with sections to help in completing each question.
+
+Submit your R script and responses to each questions in the Lab 2 Canvas assignment (*include a short code snippet for each step*)
+
+#### **Questions:**
+
+1. Using the information provided below, Calculate the semi-minor axis of the GRS80 ellipsoid, which is the basis for NAD83 and and is applicable to ITRF and IGS.
+2. Calculate the difference in ellipsoid radius at the poles compared to the equator.
+3. If you were tasked with drilling a hole to the center of the Earth, and wanted to minimize the distance to be drilled, where would you go to do it?
+4. Imagine you're working on two field projects in UTM Zone 12N. In both cases, you're walking along an east-west path that is 1 km long, counting the number of Great Basin Sagebrush plants within 10 meters of your path. The first project is located at an easting of 500,000 meters (center of UTM Zone). The second project is located at an easting of 750,000 meters (closer to the edge of the zone, where distortion is more noticeable). You're trying to understand whether the distortion will significantly affect your measurements. What would the apparent plant density be at the edge compared to the center due to distortion from the projection alone?
+      * *Hint: compare the ratios of* ${plants}/{distance}$ *between locations*
+
+*Read the R basics section for the next several questions*
+
+Load the following matrix array into `RStudio` (copy/paste and run in your script):
+
+```r
+# load in coordinates
+p1 <- matrix(c(
+  -111.71452, 40.27809,
+  -111.71459, 40.27809,
+  -111.71453, 40.27816,
+  -111.71454, 40.27809,
+  -111.71452, 40.27805,
+  -111.71451, 40.27806,
+  -111.71454, 40.27806,
+  -111.71452, 40.27803,
+  -111.71453, 40.27807,
+  -111.71455, 40.27799
+), ncol = 2, byrow = TRUE)
+colnames(p1) <- c("x", "y")
+```
+
+This includes 10 GPS points collected from the same location using a phone.
+
+5. Calculate the average coordinates for longitude (x) and latitude (y).
+6. Calculate the standard deviation of each coordinate. Convert these values to meters.
+      * *the conversion is* `1 deg ≈ 111,319 m` *for latitude and* `1 deg ≈ 84,964 m` *for longitude (based on our latitude).* 
+7. What do the mean and standard deviation values represent for these data? 
+8. Calculate the linear distance (*Euclidean distance in our case*) between the 2nd, 3rd and 9th coordinates in `p1` in meters. How do these distances compare with your standard deviation listed above?
+      * *Hint: convert you x and y differences to meters prior to calculating distance*
+      
+9. Create a basic scatterplot in R using the base `plot` function to show the GPS measurements. Add a center point and buffer for the first and second standard deviation around your center point. Follow these steps and use the code below:
+      * First, calculate the individual differences between your longitude (x) & latitude (y) values from your estimated center point. (i.e. all differences in x and y)
+      * Second, convert these differences into meters using the same conversion as before
+      * Third, assume a center point of (0, 0) and use trigonometry to create coordinates to draw a circle based on the standard deviations you calculated for x and y
+      * Visualize your results (see below)
+
+
+For question 9, the third step, use the following in a script:
+
+```r
+# define center points (since we are plotting differences from mean)
+center_x <- 0
+center_y <- 0
+
+# create angles
+theta <- seq(0, 2*pi, length.out = 200)
+
+# parametric equation of an ellipse (1 sd)
+ellipse_x <- center_x + sd_x * cos(theta)
+ellipse_y <- center_y + sd_y * sin(theta)
+
+# create ellipse for 2nd sd
+# ...add your code here
+```
+
+For question 9, fourth step, use this for the final plot:
+
+```r
+# plot the original points (use asp=1 to maintain aspect ratio)
+plot(x_differences, y_differences, asp = 1, pch = 19, col = "black", cex=0.6,
+     xlab = "East–West", ylab = "North–South",
+     main = "GPS accuracy")
+
+# ^...update names for 'x_differences' and 'y_differences'
+
+# add sd ellipses
+lines(ellipse_x, ellipse_y, col = adjustcolor("firebrick", 0.6), lty = 2)
+
+# add 2nd sd ellipses
+# ...add your code here
+
+# add center point
+points(0, 0, pch = 3, col = "gray", cex = 1.2)
+
+# add a legend (optional)
+# ...
+
+# add your sd values (optional)
+# ...
+```
+
+<br>
+  
+There are **two options** for the next question:
+
+- (potentially easier) Continue using R, with the provided information and code snippets. 
+- Export your data (p1 & mean) as a csv file and read it in as XY data into ArcGIS Pro. 
+
+
+10. Convert points into geospatial data using either R or ArcGIS. Load the data with the CRS defined as *WGS84* (correct for GPS) and again (incorrectly) as *NAD27* and *NAD83* (both of which use different datums). You will then force the two incorrect NAD data back into WGS84. Provide the **average distance between all points** and indicate the **direction** of shift for both NAD27 and NAD83 compared with WGS84. This demonstrates how incorrectly assigning a CRS will impact your results.
+      * For ArcGIS: use the XY to Table, Project, Define, and distance-based functions
+      * For R: Install and load the `terra` package (see details at end of doc). Then follow the steps below to create a SpatialVector object with the `vect` function to create spatial point datasets.
+
+```r
+# load in data correctly
+p1_wgs <- vect(p1, type="points", crs='epsg:4326') # WGS84 ellipsoid
+
+# incorrectly load other data
+p1_nad27 <- vect(p1, type="points", crs='epsg:4267') # NAD27 Clark 1866 ellipsoid
+p1_nad83 <- vect(p1, type="points", crs='epsg:4269') # NAD83 (1986)
+
+# project to same reference frame (still incorrect)
+p1_nad27 <- project(p1_nad27, 'epsg:4326')
+p1_nad83 <- project(p1_nad83_1, 'epsg:4326')
+
+# calculate distances
+distance(p1_wgs, ..., pairwise=T)
+
+# calculate mean distance for both
+# ...add your code here
+
+# plot results (optional)
+par(mfrow=c(1,2)) # side-by-side
+plot(ext(buffer(p1_wgs, 80)), main='WGS84 vs NAD27') # larger window
+plot(p1_wgs, add=T) # correct points plot 1
+plot(p1_nad27, col='red', pch=3, add=T) 
+plot(p1_wgs, main='WGS84 vs NAD83') # correct points plot 2
+plot(p1_nad83,col='red', pch=3, add=T)
+```
+<br>
+
+11. Use the provided table of GPS measurements from a previous year to calculate the center point for each corner of the ponds (P1-5), calculate the distances between each point and use these to estimate the dimensions of the pond. How close to the truth do you think these results are? (consider the standard deviation of each corner) 
+        * You may use R, ArcGIS Pro, or Excel for this step
+        * (optional) Use these points to create a polygon and estimate the area. Could also compare with basemaps. 
+
+
+12. Follow along on Dr. Bund's instructions in the attached document to explore epochs. List your coordinates in two separate dataframes and list teh distance between the two.
+
+<br>
+
+*Please reach out for help asap if you need it!*
+
+<br>
+
+
+___
+
+## **Section 1:** Shape of the Earth and Ellipsoid
+
+Important vocabulary:
+
+| Term      | Explanation                                                              |
+| --------- | ------------------------------------------------------------------------ |
+| Datum     | Reference point or surface for measuring locations on Earth.             |
+| Ellipsoid | A mathematically defined, smooth shape approximating Earth's shape.      |
+| Geoid     | The shape of Earth's mean sea level, used as a vertical reference.       |
+| GCS       | Geographic Coordinate System, using latitude and longitude.              |
+| WGS84     | A global datum and coordinate system used by GPS.                        |
+| NAD       | North American Datum, used mainly in North America (e.g., NAD27, NAD83). |
+| PCS       | Projected Coordinate System, converting 3D Earth to flat maps.           |
+| UTM       | Universal Transverse Mercator, a common projected coordinate system.     |
+
+
+<br>
+
+
+
+The Earth is not a perfect sphere but an ellipsoid, slightly flattened at the poles. The **semi-major axis** is the longest diameter of the ellipsoid, stretching from the center to the surface at the equator. This is a key parameter in most Earth models like **WGS84** and **GRS80**. The **semi-minor axis** is the shorter diameter, with a radius from the center to a pole.
+
+
+For example, the **GRS80 ellipsoid** (used to define NAD83) has the following properties:
+
+* Semimajor axis (equatorial radius): **6,378,137 meters**
+* Flattening (f): **1 / 298.257222101**
+
+
+Flattening is calculated as:
+
+$$
+f = \frac{a - b}{a}
+$$
+
+where:
+
+* $a$ = semimajor axis
+* $b$ = semiminor axis (polar radius)
+
+Note that you can use the information above to find information about the semi-minor axis and the difference between the two axes for an ellipsoid. 
+
+**Purpose:** You will respond to a few questions about the ellipsoid in this assignment.
+
+<br>
+
+___
+
+## **Section 2:** UTM Zones, Scaling, and Distortion
+
+UTM divides the world into 60 zones, each 6 degrees wide. Zone 12N covers longitude 114°W to 108°W in the Northern Hemisphere.
+
+Because UTM projects the curved Earth onto a flat surface, there is distortion, especially toward the edges of each zone. Distortion increases as you move east or west from the central meridian of the zone.
+
+* The scale factor at the central meridian (500,000) is 0.9996 (slightly less than 1), reducing distortion near the center.
+* At about 3° east or west from the center, scale factor approaches 1 (no scale distortion).
+* Beyond that, scale distortion increases. For example, around 750,000 m  the scale factor increases to 1.0010 (*approximate, varies by latitude*)
+
+**Purpose:** You will use this information to calculate the amount of distortion that could occur from using this projection.
+
+<br>
+
+___
+
+## **Section 3:** Calculating Distance with Pythagorean Theorem
+
+When working with points on a flat surface (like a map or a local projected coordinate system), we can measure the straight-line distance between two points using the **Pythagorean Theorem**. Condiser the following figure and recall the basic relationship with right triangles:
+
+```{r include_image, echo=FALSE, out.width="50%"}
+knitr::include_graphics("../img/pythagoras-bbc.png")
+```
+
+*source: BBC*
+
+This same concept can be used with spatial data. If you know the coordinates of two points — say, $(x_1, y_1)$ and $(x_2, y_2)$ — the distance between them is the length of the hypotenuse of a right triangle. We can rewrite the equation above as:
+
+$$
+\text{distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
+$$
+
+This method works well for **short distances** or in **planar coordinate systems** like UTM, but it becomes less accurate for long distances on the curved surface of the Earth (where spherical or ellipsoidal formulas are used instead).
+
+Example in R:
+
+```r
+x1 <- 1; y1 <- 2
+x2 <- 4; y2 <- 6
+distance <- sqrt((x2 - x1)^2 + (y2 - y1)^2)
+distance
+```
+Note that `sqrt()` is a built-in R function to calculate the square root. You can look up help for any function by running `?` followed by the function name (e.g. `?sqrt`). You can also use the *Help* tab in the lower right window.
+
+**Purpose:** You will used this step to calculate the distance between your measured points.
+
+<br>
+
+___
+
+## **Section 4:** A Brief Introduction to R
 
 R is a free software environment used for statistical computing and graphics. It is very useful for analyzing data, including geographic information, because it can handle numbers, tables, and even geographic coordinates and map projections easily.
 
@@ -222,115 +474,18 @@ In general, R is similar in capabilities and functionality to Matlab, Python, Ju
 
 <br>
 
-## **Section 1:** Shape of the Earth and Ellipsoid
-
-Important vocabulary:
-
-| Term      | Explanation                                                              |
-| --------- | ------------------------------------------------------------------------ |
-| Datum     | Reference point or surface for measuring locations on Earth.             |
-| Ellipsoid | A mathematically defined, smooth shape approximating Earth's shape.      |
-| Geoid     | The shape of Earth's mean sea level, used as a vertical reference.       |
-| GCS       | Geographic Coordinate System, using latitude and longitude.              |
-| WGS84     | A global datum and coordinate system used by GPS.                        |
-| NAD       | North American Datum, used mainly in North America (e.g., NAD27, NAD83). |
-| PCS       | Projected Coordinate System, converting 3D Earth to flat maps.           |
-| UTM       | Universal Transverse Mercator, a common projected coordinate system.     |
-
-
-<br>
-
-
-
-The Earth is not a perfect sphere but an ellipsoid, slightly flattened at the poles. The **semi-major axis** is the longest diameter of the ellipsoid, stretching from the center to the surface at the equator. This is a key parameter in most Earth models like **WGS84** and **GRS80**. The **semi-minor axis** is the shorter diameter, with a radius from the center to a pole.
-
-
-For example, the **GRS80 ellipsoid** (used to define NAD83) has the following properties:
-
-* Semimajor axis (equatorial radius): **6,378,137 meters**
-* Flattening (f): **1 / 298.257222101**
-
-
-Flattening is calculated as:
-
-$$
-f = \frac{a - b}{a}
-$$
-
-where:
-
-* $a$ = semimajor axis
-* $b$ = semiminor axis (polar radius)
-
-Note that you can use the information above to find information about the semi-minor axis and the difference between the two axes for an ellipsoid. 
-
-**Purpose:** You will respond to a few questions about the ellipsoid in this assignment.
-
-<br>
 
 ___
 
-## **Section 2:** Calculating Distance with Pythagorean Theorem
-
-When working with points on a flat surface (like a map or a local projected coordinate system), we can measure the straight-line distance between two points using the **Pythagorean Theorem**. Condiser the following figure and recall the basic relationship with right triangles:
-
-```{r include_image, echo=FALSE, out.width="50%"}
-knitr::include_graphics("../img/pythagoras-bbc.png")
-```
-
-*source: BBC*
-
-This same concept can be used with spatial data. If you know the coordinates of two points — say, $(x_1, y_1)$ and $(x_2, y_2)$ — the distance between them is the length of the hypotenuse of a right triangle. We can rewrite the equation above as:
-
-$$
-\text{distance} = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}
-$$
-
-This method works well for **short distances** or in **planar coordinate systems** like UTM, but it becomes less accurate for long distances on the curved surface of the Earth (where spherical or ellipsoidal formulas are used instead).
-
-Example in R:
-
-```r
-x1 <- 1; y1 <- 2
-x2 <- 4; y2 <- 6
-distance <- sqrt((x2 - x1)^2 + (y2 - y1)^2)
-distance
-```
-Note that `sqrt()` is a built-in R function to calculate the square root. You can look up help for any function by running `?` followed by the function name (e.g. `?sqrt`). You can also use the *Help* tab in the lower right window.
-
-**Purpose:** You will used this step to calculate the distance between your measured points.
-
-<br>
-
-___
-
-## **Section 3:** UTM Zones, Scaling, and Distortion
-
-UTM divides the world into 60 zones, each 6 degrees wide. Zone 12N covers longitude 114°W to 108°W in the Northern Hemisphere.
-
-Because UTM projects the curved Earth onto a flat surface, there is distortion, especially toward the edges of each zone. Distortion increases as you move east or west from the central meridian of the zone.
-
-* The scale factor at the central meridian is 0.9996 (slightly less than 1), reducing distortion near the center.
-* At about 3° east or west from the center, scale factor approaches 1 (no scale distortion).
-* Beyond that, scale distortion increases.
-
-**Purpose:** You will use this information to calculate the amount of distortion that could occur from using this projection.
-
-<br>
-
-
-
-___
-
-## **Section 4:** Spatial Data in R with `terra`
+## **Section 5:** Spatial Data in R with `terra`
 
 The `terra` package is used to work with spatial data. Note, that you will need to install this package, which may not work on any computer without properly installing other dependencies. This should work well in the lab.
 
 Install and load `terra`:
 
 ```r
-install.packages("terra")
-library(terra)
+install.packages("terra") # only need to do once
+library(terra) # must do everytime you open a new R session
 ```
 
 Create point data and assign a coordinate system:
@@ -358,204 +513,16 @@ Other common EPSG codes:
 * NAD83: "EPSG:4269"
 * UTM Zone 12N (WGS84): "EPSG:32612"
 
-Spatial data can be visualized by plotting with the same base `plot` functions.
+Geographic data can be visualized in many ways, we'll keep it simple for now. 
 
-Optional Mapping with `leaflet` can make things look quite a bit cooler.
-
-Install and load the `leaflet` package:
-
-```r
-install.packages("leaflet")
-library(leaflet)
-```
-
-Plot points interactively:
-
-```r
-leaflet() %>%
-  addTiles() %>%
-  addMarkers(lng = c(-111.715283, -111.715451), lat = c(40.27754852, 40.2775552), popup = c("Point 1", "Point 2"))
-```
-
-<br>
-<br>
-
-___
-
-## **Lab Questions:**
-
-Submit your R script and responses to these questions in the Lab 2 Canvas assignment (*include a short code snippet for each step*)
-
-#### **Questions:**
-
-1. Using the information above, Calculate the semi-minor axis of the GRS80 ellipsoid, which is the basis for NAD83 and and is applicable to ITRF and IGS.
-2. Calculate the difference in ellipsoid radius at the poles compared to the equator.
-3. If you were tasked with drilling a hole to the center of the Earth, and wanted to minimize the distance to be drilled, where would you go to do it?
-
-Read in the following matrix array (copy/paste and run in your script):
-
-```r
-p1 <- matrix(c(
-  -111.71452, 40.27809,
-  -111.71459, 40.27809,
-  -111.71453, 40.27816,
-  -111.71454, 40.27809,
-  -111.71452, 40.27805,
-  -111.71451, 40.27806,
-  -111.71454, 40.27806,
-  -111.71452, 40.27803,
-  -111.71453, 40.27807,
-  -111.71455, 40.27799
-), ncol = 2, byrow = TRUE)
-colnames(p1) <- c("x", "y")
-```
-
-This included 10 GPS points collected from the same location using a phone.
-
-4. Calculate the average coordinates for longitude (x) and latitude (y).
-6. Calculate the standard deviation of each coordinate. Convert these values to meters.
-  * *the conversion is* `1 deg ≈ 111,132 m` *for latitude and* `1 deg ≈ 84,964 m` *for longitude (based on our latitude).* 
-7. What do the mean and standard deviation values represent for these data? 
-8. Calculate the linear distance (*Euclidean distance in our case*) between the 2nd, 3rd and 9th coordinates in `p1` in meters. How do these distances compare with your standard deviation listed above?
-  * *Hint: convert you x and y differences to meters prior to calculating distance*
-
-
-  
-There are **two options** for the next step:
-
-1) 
-
-9. 
-
-<br>
-
-*Please reach for help asap if you need it!*
-
-<br>
-
-___
-
-
-
-
-
-
-Absolutely — the original questions are written in a very technical and compact way. Here’s a rewritten version that’s clearer, more structured, and easier to follow while keeping the technical depth.
-
----
-
-## 🔍 **Rewritten Version of the Problem Sets**
-
----
-
-### **Problem A: UTM Distortion and Plant Survey**
-
-Imagine you're working on two field projects in **UTM Zone 12**, using UTM (Universal Transverse Mercator) coordinates. In both cases, you're walking along an **east-west path that is 1 km long**, and you're counting the number of **Great Basin Sagebrush** plants that are within 10 meters of your path.
-
-* The first project is located at an **easting of 500,000 meters** (which is at the center of UTM Zone 12).
-* The second project is located at an **easting of 750,000 meters** (closer to the edge of the zone, where distortion is more noticeable).
-
-You're trying to understand whether the **UTM projection distortion** will significantly affect your measurements.
-
----
-
-#### **A1. How much distortion is there at each location?**
-
-* Look up (online or from lecture notes) the **UTM scale factor** at:
-
-  * The **center of the zone** (500,000 m easting).
-  * The **edge of the zone** (750,000 m easting).
-* These scale factors tell you how much the UTM projection **shrinks or stretches** distances compared to real-world ground distances.
-
----
-
-#### **A2. How does this distortion affect your plant density calculation?**
-
-* You’re measuring plant density as:
-
-  $$
-  \text{Plant Density} = \frac{\text{Number of Plants}}{1\, \text{km}}
-  $$
-
-* But due to UTM distortion, your **actual walking distance on the ground** may be slightly more or less than 1 km.
-
-* Use the scale factors you found in A1 to calculate:
-
-  * The **actual ground distance** of your 1 km traverse.
-  * The **true plant density**, based on this corrected distance.
-
-* Then calculate the **ratio of apparent to actual plant density** to find out how much error UTM distortion introduces.
-
----
-
-#### **A3. Is this error important?**
-
-* Based on your calculations, is the distortion large enough to affect your study results in a meaningful way?
-* Consider the **size of the error** compared to natural variability in plant counts.
-
----
-
-### **Problem B: Plate Motion and Coordinate Systems**
-
-Now imagine a second situation involving plate tectonics.
-
-You and a colleague are measuring the distance between two fixed points on the Earth’s surface, which are moving slowly over time due to **tectonic motion**.
-
-* **Two years ago**, you measured the distance as **exactly 1,000.000 meters**, using the **IGS08 geodetic coordinate system** (which is very accurate for tracking global positions).
-* **This year**, your colleague measured the same two points again, but used **UTM Zone 12 coordinates** instead.
-
----
-
-#### **B1. How much could UTM distortion affect the measurement?**
-
-* Based on your understanding of UTM distortion (from Problem A), how much **error** might your colleague’s measurement include just because they used UTM instead of IGS08?
-
----
-
-#### **B2. How does that compare to actual tectonic motion?**
-
-* How far apart might the two points **really have moved** in the past two years due to plate tectonics?
-* Use a typical plate motion speed (e.g., **2.5 cm/year**) to estimate the expected tectonic shift.
-* Then compare this tectonic shift to the possible error introduced by using UTM.
-
----
-
-## ✅ Summary
-
-This version:
-
-* Breaks the problem into clear steps.
-* Uses simple and consistent wording.
-* Clarifies the difference between coordinate distortion and real-world movement.
-
-Let me know if you'd like a worksheet-style version or a visual to go with it!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+R can be an incredibly capable GIS but the workflow for interacting with geographic data is different (scripting-based rather than a visual map interface). We may use R a bit more this semester but more experience using R or python as a GIS is covered in GEOG 3440 and other courses.
 
 
 <br>
 <br>
 
 
-Acknowledgments
+Acknowledgments:
 
 *This document was created with assistance from OpenAI's ChatGPT language model to help structure and draft explanations.*
 
