@@ -222,7 +222,6 @@ sf::st_distance(pt_wgs84, pt_nad83)
 
 ################
 ponds1 = read.csv('~/Downloads/ponds1.csv')
-head(ponds1)
 
 tolower(gsub('[[:punct:]]', '', gsub('*._(.*)','', ponds1$Title) ))
 ponds1$Title = tolower(sub("^(.{2}).*$", "\\1", ponds1$Title))
@@ -230,6 +229,12 @@ ponds1$Title = tolower(sub("^(.{2}).*$", "\\1", ponds1$Title))
 pd1 = ponds1[order(ponds1$Title),]
 
 write.csv(pd1, 'tmp-data/pond_measurements2023.csv', row.names = F)
+
+
+ponds1 = read.csv('tmp-data/pond_measurements2023.csv')
+head(ponds1)
+
+aggregate(cbind(Latitude, Longitude) ~ Title, data = ponds1, FUN = mean)
 
 
 library(sf)

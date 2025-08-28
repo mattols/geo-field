@@ -400,7 +400,7 @@ significantly affect your measurements. What would the apparent plant
 density be at the edge compared to the center due to distortion from the
 projection alone?
 <ul>
-<li><em>Hint: compare the ratios of</em> <span class="math inline">\({plants}/{distance}\)</span> <em>between
+<li><em>Hint: compare the ratios of</em> <span class="math inline">\({plants}/{true~distance}\)</span> <em>between
 locations</em></li>
 </ul></li>
 </ol>
@@ -436,17 +436,18 @@ on our latitude).</em></li>
 <li>What do the mean and standard deviation values represent for these
 data?</li>
 <li>Calculate the linear distance (<em>Euclidean distance in our
-case</em>) between the 2nd, 3rd and 9th coordinates in <code>p1</code>
-in meters. How do these distances compare with your standard deviation
-listed above?
+case</em>) between the center points and the 2nd, 3rd and 9th coordinate
+pairs in <code>p1</code> (unit should be meters). How do these distances
+compare with your standard deviation listed above?
 <ul>
-<li><em>Hint: convert you x and y differences to meters prior to
-calculating distance</em></li>
+<li><em>Hint: convert x and y degree differences to meters prior to
+calculating euclidean distance</em></li>
 </ul></li>
 <li>Create a basic scatterplot in R using the base <code>plot</code>
 function to show the GPS measurements. Add a center point and buffer for
-the first and second standard deviation around your center point. Follow
-these steps and use the code below:
+the first and second standard deviation around your center point. Note
+how this differs in the x and y direction. Follow these steps and use
+the code below:
 <ul>
 <li>First, calculate the individual differences between your longitude
 (x) &amp; latitude (y) values from your estimated center point.
@@ -472,14 +473,14 @@ ellipse_x &lt;- center_x + sd_x * cos(theta)
 ellipse_y &lt;- center_y + sd_y * sin(theta)
 
 # create ellipse for 2nd sd
-# ...add your code here</code></pre>
+# ...add your code here (copy/modify ellipse equations above)</code></pre>
 <p>For question 9, fourth step, use this for the final plot:</p>
 <pre class="r"><code># plot the original points (use asp=1 to maintain aspect ratio)
 plot(x_differences, y_differences, asp = 1, pch = 19, col = &quot;black&quot;, cex=0.6,
      xlab = &quot;East–West&quot;, ylab = &quot;North–South&quot;,
      main = &quot;GPS accuracy&quot;)
 
-# ^...update names for &#39;x_differences&#39; and &#39;y_differences&#39;
+# ^...update names for &#39;x_differences&#39; and &#39;y_differences&#39; based on your data
 
 # add sd ellipses
 lines(ellipse_x, ellipse_y, col = adjustcolor(&quot;firebrick&quot;, 0.6), lty = 2)
@@ -490,10 +491,10 @@ lines(ellipse_x, ellipse_y, col = adjustcolor(&quot;firebrick&quot;, 0.6), lty =
 # add center point
 points(0, 0, pch = 3, col = &quot;gray&quot;, cex = 1.2)
 
-# add a legend (optional)
+# add a legend (optional) - &#39;\u03C3&#39; is character for sigma
 # ...
 
-# add your sd values (optional)
+# add your sd values (optional) 
 # ...</code></pre>
 <p><br></p>
 <p>There are <strong>two options</strong> for the next question:</p>
@@ -513,12 +514,12 @@ points</strong> and indicate the <strong>direction</strong> of shift for
 both NAD27 and NAD83 compared with WGS84. This demonstrates how
 incorrectly assigning a CRS will impact your results.
 <ul>
-<li>For ArcGIS: use the XY to Table, Project, Define, and distance-based
-functions</li>
-<li>For R: Install and load the <code>terra</code> package (see details
-at end of doc). Then follow the steps below to create a SpatialVector
-object with the <code>vect</code> function to create spatial point
-datasets.</li>
+<li><strong>For ArcGIS:</strong> use the XY to Table, Project, Define,
+and distance-based functions</li>
+<li><strong>For R:</strong> Install and load the <code>terra</code>
+package (see details at end of doc). Then follow the steps below to
+create a SpatialVector object with the <code>vect</code> function to
+create spatial point datasets.</li>
 </ul></li>
 </ol>
 <pre class="r"><code># load in data correctly
@@ -552,12 +553,17 @@ to calculate the center point for each corner of the ponds (P1-5),
 calculate the distances between each point and use these to estimate the
 dimensions of the pond. How close to the truth do you think these
 results are? (consider the standard deviation of each corner) * You may
-use R, ArcGIS Pro, or Excel for this step * (optional) Use these points
-to create a polygon and estimate the area. Could also compare with
+use R, ArcGIS Pro, or Excel for this step * In R, you can subset the
+data with indexing or use the <code>aggregate()</code> function to do
+this for the entire data frame, specifying the relationship
+<code>cbind(Latitude, Longitude) ~ Title, data = ..., FUN = ...</code>
+<em>see help doc for more info</em> * (optional) Use these points to
+create a polygon and estimate the area. Could also compare with
 basemaps.</p></li>
-<li><p>Follow along on Dr. Bund’s instructions in the attached document
-to explore epochs. List your coordinates in two separate dataframes and
-list teh distance between the two.</p></li>
+<li><p>Follow along on Dr. Bunds’ instructions in the attached document
+to explore epochs. List your coordinates from the two separate reference
+frames and list the distance between the two points and calculate the
+offset between coordinates in meters.</p></li>
 </ol>
 <p><br></p>
 <p><em>Please reach out for help asap if you need it!</em></p>
@@ -574,44 +580,44 @@ list teh distance between the two.</p></li>
 <col width="88%" />
 </colgroup>
 <thead>
-<tr class="header">
+<tr>
 <th>Term</th>
 <th>Explanation</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>Datum</td>
 <td>Reference point or surface for measuring locations on Earth.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Ellipsoid</td>
 <td>A mathematically defined, smooth shape approximating Earth’s
 shape.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Geoid</td>
 <td>The shape of Earth’s mean sea level, used as a vertical
 reference.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>GCS</td>
 <td>Geographic Coordinate System, using latitude and longitude.</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>WGS84</td>
 <td>A global datum and coordinate system used by GPS.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>NAD</td>
 <td>North American Datum, used mainly in North America (e.g., NAD27,
 NAD83).</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>PCS</td>
 <td>Projected Coordinate System, converting 3D Earth to flat maps.</td>
 </tr>
-<tr class="even">
+<tr>
 <td>UTM</td>
 <td>Universal Transverse Mercator, a common projected coordinate
 system.</td>
@@ -696,6 +702,8 @@ triangle. We can rewrite the equation above as:</p>
 <strong>planar coordinate systems</strong> like UTM, but it becomes less
 accurate for long distances on the curved surface of the Earth (where
 spherical or ellipsoidal formulas are used instead).</p>
+<p><strong>Note:</strong> <em>basic R functionality is found in later
+sections.</em></p>
 <p>Example in R:</p>
 <pre class="r"><code>x1 &lt;- 1; y1 &lt;- 2
 x2 &lt;- 4; y2 &lt;- 6

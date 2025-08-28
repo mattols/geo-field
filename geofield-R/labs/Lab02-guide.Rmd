@@ -31,7 +31,7 @@ Submit your R script and responses to each questions in the Lab 2 Canvas assignm
 2. Calculate the difference in ellipsoid radius at the poles compared to the equator.
 3. If you were tasked with drilling a hole to the center of the Earth, and wanted to minimize the distance to be drilled, where would you go to do it?
 4. Imagine you're working on two field projects in UTM Zone 12N. In both cases, you're walking along an east-west path that is 1 km long, counting the number of Great Basin Sagebrush plants within 10 meters of your path. The first project is located at an easting of 500,000 meters (center of UTM Zone). The second project is located at an easting of 750,000 meters (closer to the edge of the zone, where distortion is more noticeable). You're trying to understand whether the distortion will significantly affect your measurements. What would the apparent plant density be at the edge compared to the center due to distortion from the projection alone?
-      * *Hint: compare the ratios of* ${plants}/{distance}$ *between locations*
+      * *Hint: compare the ratios of* ${plants}/{true~distance}$ *between locations*
 
 *Read the R basics section for the next several questions*
 
@@ -60,10 +60,10 @@ This includes 10 GPS points collected from the same location using a phone.
 6. Calculate the standard deviation of each coordinate. Convert these values to meters.
       * *the conversion is* `1 deg ≈ 111,319 m` *for latitude and* `1 deg ≈ 84,964 m` *for longitude (based on our latitude).* 
 7. What do the mean and standard deviation values represent for these data? 
-8. Calculate the linear distance (*Euclidean distance in our case*) between the 2nd, 3rd and 9th coordinates in `p1` in meters. How do these distances compare with your standard deviation listed above?
-      * *Hint: convert you x and y differences to meters prior to calculating distance*
+8. Calculate the linear distance (*Euclidean distance in our case*) between the center points and the 2nd, 3rd and 9th coordinate pairs in `p1` (unit should be meters). How do these distances compare with your standard deviation listed above?
+      * *Hint: convert x and y degree differences to meters prior to calculating euclidean distance*
       
-9. Create a basic scatterplot in R using the base `plot` function to show the GPS measurements. Add a center point and buffer for the first and second standard deviation around your center point. Follow these steps and use the code below:
+9. Create a basic scatterplot in R using the base `plot` function to show the GPS measurements. Add a center point and buffer for the first and second standard deviation around your center point. Note how this differs in the x and y direction. Follow these steps and use the code below:
       * First, calculate the individual differences between your longitude (x) & latitude (y) values from your estimated center point. (i.e. all differences in x and y)
       * Second, convert these differences into meters using the same conversion as before
       * Third, assume a center point of (0, 0) and use trigonometry to create coordinates to draw a circle based on the standard deviations you calculated for x and y
@@ -85,7 +85,7 @@ ellipse_x <- center_x + sd_x * cos(theta)
 ellipse_y <- center_y + sd_y * sin(theta)
 
 # create ellipse for 2nd sd
-# ...add your code here
+# ...add your code here (copy/modify ellipse equations above)
 ```
 
 For question 9, fourth step, use this for the final plot:
@@ -96,7 +96,7 @@ plot(x_differences, y_differences, asp = 1, pch = 19, col = "black", cex=0.6,
      xlab = "East–West", ylab = "North–South",
      main = "GPS accuracy")
 
-# ^...update names for 'x_differences' and 'y_differences'
+# ^...update names for 'x_differences' and 'y_differences' based on your data
 
 # add sd ellipses
 lines(ellipse_x, ellipse_y, col = adjustcolor("firebrick", 0.6), lty = 2)
@@ -107,10 +107,10 @@ lines(ellipse_x, ellipse_y, col = adjustcolor("firebrick", 0.6), lty = 2)
 # add center point
 points(0, 0, pch = 3, col = "gray", cex = 1.2)
 
-# add a legend (optional)
+# add a legend (optional) - '\u03C3' is character for sigma
 # ...
 
-# add your sd values (optional)
+# add your sd values (optional) 
 # ...
 ```
 
@@ -123,8 +123,8 @@ There are **two options** for the next question:
 
 
 10. Convert points into geospatial data using either R or ArcGIS. Load the data with the CRS defined as *WGS84* (correct for GPS) and again (incorrectly) as *NAD27* and *NAD83* (both of which use different datums). You will then force the two incorrect NAD data back into WGS84. Provide the **average distance between all points** and indicate the **direction** of shift for both NAD27 and NAD83 compared with WGS84. This demonstrates how incorrectly assigning a CRS will impact your results.
-      * For ArcGIS: use the XY to Table, Project, Define, and distance-based functions
-      * For R: Install and load the `terra` package (see details at end of doc). Then follow the steps below to create a SpatialVector object with the `vect` function to create spatial point datasets.
+      * **For ArcGIS:** use the XY to Table, Project, Define, and distance-based functions
+      * **For R:** Install and load the `terra` package (see details at end of doc). Then follow the steps below to create a SpatialVector object with the `vect` function to create spatial point datasets.
 
 ```r
 # load in data correctly
@@ -136,7 +136,7 @@ p1_nad83 <- vect(p1, type="points", crs='epsg:4269') # NAD83 (1986)
 
 # project to same reference frame (still incorrect)
 p1_nad27 <- project(p1_nad27, 'epsg:4326')
-p1_nad83 <- project(p1_nad83_1, 'epsg:4326')
+p1_nad83 <- project(p1_nad83, 'epsg:4326')
 
 # calculate distances
 distance(p1_wgs, ..., pairwise=T)
@@ -156,10 +156,11 @@ plot(p1_nad83,col='red', pch=3, add=T)
 
 11. Use the provided table of GPS measurements from a previous year to calculate the center point for each corner of the ponds (P1-5), calculate the distances between each point and use these to estimate the dimensions of the pond. How close to the truth do you think these results are? (consider the standard deviation of each corner) 
         * You may use R, ArcGIS Pro, or Excel for this step
+        * In R, you can subset the data with indexing or use the `aggregate()` function to do this for the entire data frame, specifying the relationship `cbind(Latitude, Longitude) ~ Title, data = ..., FUN = ...` *see help doc for more info*
         * (optional) Use these points to create a polygon and estimate the area. Could also compare with basemaps. 
 
 
-12. Follow along on Dr. Bund's instructions in the attached document to explore epochs. List your coordinates in two separate dataframes and list teh distance between the two.
+12. Follow along on Dr. Bunds' instructions in the attached document to explore epochs. List your coordinates from the two separate reference frames and list the distance between the two points and calculate the offset between coordinates in meters.
 
 <br>
 
@@ -251,6 +252,8 @@ $$
 $$
 
 This method works well for **short distances** or in **planar coordinate systems** like UTM, but it becomes less accurate for long distances on the curved surface of the Earth (where spherical or ellipsoidal formulas are used instead).
+
+**Note:** *basic R functionality is found in later sections.*
 
 Example in R:
 
