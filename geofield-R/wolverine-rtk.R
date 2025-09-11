@@ -19,13 +19,43 @@ base25 = dfw25[dfw25$Name==33,c('Base.easting', 'Base.northing')]
 # opus
 opus_base = c(448876.619, 4493420.068)
 
+
+# SIMPLE PLOT
+labs_24 = paste(as.character(geom(vect(df24, 
+                                       geom=c('Base.easting', 'Base.northing'), 
+                                       crs='epsg:6341'))[1,c('x','y')]), 
+                collapse=", ")
+labs_25 = paste(as.character(geom(vect(dfw25, 
+                                       geom=c('Base.easting', 'Base.northing'), 
+                                       crs='epsg:6341'))[1,c('x','y')]), 
+                collapse=", ")
+labs_opus = paste(as.character(opus_base), collapse=", ")
+  
 # plot base locations
 plot(buffer(vect(cbind(448876.619, 4493420.068), crs='epsg:6341'),2))
 plot(buffer(vect(cbind(448876.619, 4493420.068), crs='epsg:6341'),1), lty=2, add=T)
 plot(buffer(vect(cbind(448876.619, 4493420.068), crs='epsg:6341'),0.5), lty=3, add=T)
 plot(vect(df24, geom=c('Base.easting', 'Base.northing'), crs='epsg:6341'),pch=1,add=T)
+text(vect(df24, geom=c('Base.easting', 'Base.northing'), crs='epsg:6341')[1,],pch=1,add=T, 
+     labels = labs_24, cex = 0.7,
+     adj = c(-0.1,-1.5), col='firebrick', font=2)
 plot(vect(dfw25, geom=c('Base.easting', 'Base.northing'), crs='epsg:6341'),pch=2,add=T)
+text(vect(dfw25, geom=c('Base.easting', 'Base.northing'), crs='epsg:6341')[1,],pch=1,add=T, 
+     labels = labs_25, cex = 0.7,
+     adj = c(-0.1,1.5), col='firebrick', font=2)
 plot(vect(cbind(448876.619, 4493420.068), crs='epsg:6341'), add=T, pch=3)
+text(vect(matrix(opus_base, ncol=2), crs='epsg:6341')[1,],pch=1,add=T, 
+     labels = labs_opus, cex = 0.7,
+     adj = c(-0.1,-0.5), col='firebrick', font=2)
+legend('topright', c('2 meters', '1 meter', '0.5 meter'), lty=c(1,2,3))
+legend('topleft', c('2024', '2025', 'OPUS'), pch=c(1,2,3))
+
+# dist
+distance(vect(df24, geom=c('Base.easting', 'Base.northing'), crs='epsg:6341')[1,], 
+         vect(matrix(opus_base, ncol=2), crs='epsg:6341'))
+distance(vect(dfw25, geom=c('Base.easting', 'Base.northing'), crs='epsg:6341')[1,], 
+         vect(matrix(opus_base, ncol=2), crs='epsg:6341'))
+# END plot
 
 # adjust 2024
 delta_coords24 <- opus_base - base24
