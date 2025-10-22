@@ -356,17 +356,49 @@ display: none;
 </div>
 
 
-<div id="objective" class="section level2">
-<h2>Objective</h2>
-<p>In this assignment, you will calculate important aerial
-photogrammetry parameters: <strong>Field of View (FOV), Ground Sampling
-Distance (GSD), and Frontal Overlap</strong> using different drone
-cameras and altitudes. You will write clean R code, create tables, and
-respond to analysis questions.</p>
+<div id="learning-objective" class="section level2">
+<h2>Learning Objective</h2>
+<p>In this lab, you will learn about important aerial photogrammetry
+parameters:</p>
+<ul>
+<li><strong>Field of View (FOV)</strong></li>
+<li><strong>Ground Sampling Distance (GSD)</strong></li>
+<li><strong>Image Overlap</strong></li>
+</ul>
+<p>Understanding these terms will allow you connect image size, image
+number, image overlap, and flying altitude in planning a field UAV
+mission.</p>
+</div>
+<div id="description" class="section level2">
+<h2>Description</h2>
+<p>When planning fieldwork with a small UAV (sUAV) for Structure from
+Motion (SfM), key camera and flight parameters must be carefully
+coordinated. Camera properties like focal length and sensor size
+determine the field of view (FOV), which in turn influences the ground
+sampling distance (GSD)—the size of each pixel on the ground and a key
+measure of image resolution. A smaller GSD (i.e., higher resolution)
+enables more precise 3D models and measurements but requires flying
+lower or using higher-quality cameras. Finally, image overlap is
+critical for SfM, as the software reconstructs 3D structure by matching
+features across multiple overlapping images. Balancing these factors
+ensures optimal image quality, coverage, and data accuracy for
+successful photogrammetric outputs.</p>
+<p>Read through the sections in the course book about FOV, GSD, and
+overlap to get a more solid understanding.</p>
 <hr />
-<div id="camera-specifications" class="section level3">
-<h3>Camera Specifications</h3>
-<p>You may use <strong>only the values provided</strong> below.</p>
+</div>
+<div id="questions" class="section level2">
+<h2>Questions</h2>
+<p><strong>Use R</strong> to calculate your results and answer
+questions. If you need a basic refresher on R, revisit Lab 2.
+<strong>Keep in mind</strong> that R provides the ability to create
+variables (e.g. <code>x &lt;- 5</code>) and can perform arithmetric on
+multiple arrays of values (e.g., <code>x * c(1,3,5,7)</code>). The
+ability to create <code>functions</code> and <code>data.frames</code>
+are also useful features!</p>
+<p>Answer each question completely and in your own words. Include work
+or code snippets for each.</p>
+<p>Use the following table to answer questions 1-2:</p>
 <table>
 <colgroup>
 <col width="17%" />
@@ -377,7 +409,7 @@ respond to analysis questions.</p>
 <col width="16%" />
 </colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>Drone</th>
 <th>Sensor Width (mm)</th>
 <th>Sensor Height (mm)</th>
@@ -387,7 +419,7 @@ respond to analysis questions.</p>
 </tr>
 </thead>
 <tbody>
-<tr>
+<tr class="odd">
 <td>Phantom 4 Pro</td>
 <td>13.2</td>
 <td>8.8</td>
@@ -395,7 +427,7 @@ respond to analysis questions.</p>
 <td>5472</td>
 <td>3648</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Mavic Air 2</td>
 <td>6.3</td>
 <td>4.7</td>
@@ -403,7 +435,7 @@ respond to analysis questions.</p>
 <td>8000</td>
 <td>6000</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>Mini 4 Pro</td>
 <td>6.3</td>
 <td>4.7</td>
@@ -411,7 +443,7 @@ respond to analysis questions.</p>
 <td>8064</td>
 <td>6048</td>
 </tr>
-<tr>
+<tr class="even">
 <td>Mavic 3 Enterprise</td>
 <td>13.2</td>
 <td>8.8</td>
@@ -421,122 +453,153 @@ respond to analysis questions.</p>
 </tr>
 </tbody>
 </table>
-<p>Got it! Here’s the same section written in <strong>R Markdown-ready
-markdown</strong>, with equations written using <strong>MathJax inline
-and block math syntax</strong> that you can directly copy-paste into an
-Rmd document.</p>
-<hr />
-<div id="workflow" class="section level4">
-<h4>Workflow</h4>
-<p>Now that you have the <strong>camera specifications</strong> (sensor
-width, sensor height, focal length, image resolution), you can:</p>
+<p><br /></p>
 <ol style="list-style-type: decimal">
-<li>Calculate the <strong>Field of View (FOV)</strong> in meters based
-on the sensor size and focal length.</li>
-<li>Use the FOV and image resolution to estimate <strong>Ground Sampling
-Distance (GSD)</strong> (the ground area represented by each
-pixel).</li>
-<li>Determine the required <strong>frontal and lateral overlaps</strong>
-to ensure that <strong>each pixel is captured in 9 different
-images</strong> (i.e., 3 images across width and height).</li>
-<li>Discuss if GSD differs when calculated using sensor width
-vs. height.</li>
+<li><strong>Question 1</strong> Choose two drones from the table above
+and the following equations to calculate the <strong>Field of View
+(FOV)</strong> in <strong>degrees</strong> (angular measurement of
+camera), then convert this FOV to meters on the ground based on the
+sensor size and focal length for heights of 20, 50, and 100 meters. Your
+final result will provide the FOV ground size for each UAV above, at the
+three heights listed, in both horizontal and vertical directions.</li>
 </ol>
-<hr />
-</div>
-</div>
-<div id="field-of-view-fov" class="section level3">
-<h3>1: Field of View (FOV)</h3>
+<p>For example:</p>
+<table>
+<colgroup>
+<col width="17%" />
+<col width="12%" />
+<col width="16%" />
+<col width="16%" />
+<col width="17%" />
+<col width="17%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Drone</th>
+<th>Altitude_m</th>
+<th>FOV_degrees_h</th>
+<th>FOV_degrees_v</th>
+<th>FOV_ground_m_h</th>
+<th>FOV_ground_m_h</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Phantom 4 Pro</td>
+<td>20 m</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Phantom 4 Pro</td>
+<td>50 m</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Phantom 4 Pro</td>
+<td>100 m</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>Phantom 4 Pro</td>
+<td>250 m</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>Mini 4 Pro</td>
+<td>20 m</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <p>The <strong>FOV</strong> in radians for one dimension (width or
 height) is calculated by the camera’s sensor size and focal length:</p>
 <p><span class="math display">\[
 FOV_{\text{radians}} = 2 \times \arctan\left(\frac{\text{Sensor
 Dimension (mm)}}{2 \times \text{Focal Length (mm)}}\right)
-\]</span></p>
+\]</span> This equation above calculates the angular field of view (in
+radians) for either the width or height of the camera’s view. Radians
+can be converted to degrees with <span class="math inline">\(\text{degrees} = \text{radians} \times
+\frac{180}{\pi}\)</span>. To convert the angular FOV into linear
+distance on the ground, i.e., the width or height of the area visible in
+one photo, assuming a flat surface and nadir (straight-down) view.</p>
 <p>Convert this to <strong>meters on the ground</strong> by multiplying
 by the flight altitude (H) (in meters):</p>
 <p><span class="math display">\[
 FOV_{\text{ground}} = 2 \times H \times
 \tan\left(\frac{FOV_{\text{radians}}}{2}\right)
-\]</span></p>
-<p>Calculate <strong>both width and height FOVs</strong> using the
-sensor width and height, respectively.</p>
-<hr />
-</div>
-<div id="ground-sampling-distance-gsd" class="section level3">
-<h3>2: Ground Sampling Distance (GSD)</h3>
-<p>Using the ground FOV and the image resolution, calculate the GSD for
-width and height:</p>
+\]</span> <br /></p>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Question 2</strong> Use the FOV and image resolution to
+estimate <strong>Ground Sampling Distance (GSD)</strong> (the ground
+area represented by each pixel) for your two drones at each height above
+ground level in <strong>cm/px</strong>. Only report GSD in the width
+dimention.</li>
+</ol>
+<p>Calculate the GSD for width and height:</p>
 <p><span class="math display">\[
-GSD_{\text{width (height)}} = \frac{FOV_{\text{ground width
-(height)}}}{\text{Image_width (height) (in px)}}
+GSD_{\text{width}} = \frac{FOV_{\text{ground width}}}{\text{Image_width
+(in px)}}
 \]</span></p>
 <p><em>Note:</em> GSD is in meters per pixel (m/px). Divide by 100 to
 get cm/px.</p>
-<hr />
-<div id="overlap-for-x9-pixel-coverage" class="section level4">
-<h4>3: Overlap for x9 Pixel Coverage</h4>
+<p><br /></p>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>Question 3</strong> How does increasing altitude affect GSD
+and image resolution? Provide examples with your results.</li>
+</ol>
+<p><br /></p>
+<ol start="4" style="list-style-type: decimal">
+<li><strong>Question 4</strong> Which of your drones is more efficient
+for mapping large areas? Why?</li>
+</ol>
+<p><br /></p>
+<ol start="5" style="list-style-type: decimal">
+<li><strong>Question 5</strong> You are planning a drone flight at 100
+meters altitude using the Phantom 4 Pro. If you require 66.7% frontal
+overlap and the FOV ground height at that altitude is 71.2 meters, how
+far apart should your images be captured along the flight path?</li>
+</ol>
+<p>A few useful equations and some information to help with image
+overlap include the following:</p>
 <p>To capture each pixel in <strong>9 images</strong> (3 × 3 grid), the
 required overlap percentage is:</p>
 <p><span class="math display">\[
 \text{Overlap} = \frac{2}{3} = 0.667 = 66.7%
 \]</span></p>
-<hr />
-</div>
-<div id="calculate-overlap-distances-between-images" class="section level4">
-<h4>4: Calculate Overlap Distances Between Images</h4>
-<p>Calculate the spacing between images accounting for overlap, use the
-general equation</p>
+<p>To calculate the spacing between images in meters when accounting for
+overlap, you can use the general equation:</p>
 <p><span class="math display">\[
 \text{Spacing (m)} = \text{Image Dimension} \times (1 - \text{Overlap})
-\]</span> THe FOV ground height can also be used in this instance. For
+\]</span> The FOV ground height can also be used in this instance. For
 example:</p>
 <p><span class="math display">\[
-\text{Frontal Overlap Distance} = FOV_{\text{ground height}} \times (1 -
-0.667)
+\text{Spacing (m)} = FOV_{\text{ground height}} \times (1 - Overlap)
 \]</span></p>
-</div>
-<div id="estimate-number-of-images-to-cover-an-area" class="section level4">
-<h4>5: Estimate Number of Images to Cover an Area</h4>
-<p>Given an area of length (L) and width (W) (in meters), calculate:</p>
-<p><span class="math display">\[
-\text{Number of images} = \lceil \frac{L~(or~W)}{\text{Frontal Overlap
-Distance}} \rceil
-\]</span></p>
-<p>You would then need to multiply these values together based on the
-dimensions of your study area.</p>
-<p><span class="math display">\[
-\text{Images}_{\text{direction1}} = \left\lceil \frac{\text{Area Length}
-- \text{Image Length}}{\text{ Spacing}} \right\rceil + 1
-\]</span></p>
-<p><strong>Provide a table of the FOV in radians, ground FOV, and GSD
-for each drone at the various altitudes.</strong> (Questions 1-2)</p>
-<ol style="list-style-type: decimal">
-<li>Provide the FOV for all altitues</li>
-<li>Provide GSD for all altitudes</li>
-</ol>
+<p>The spacing describes either the frontal or lateral distance between
+flight paths (position at different time) for a UAV.</p>
 <p><br /></p>
-</div>
-</div>
-</div>
-<div id="questions" class="section level2">
-<h2>Questions</h2>
-<p>Answer the following in your own words (a few sentences each) and
-include a code snippet for each.</p>
-<ol style="list-style-type: decimal">
-<li><p>How does increasing altitude affect GSD and image resolution?
-Provide examples with data above.</p></li>
-<li><p>What trade-offs exist between high overlap and flight
-efficiency?</p></li>
-<li><p>Which of your drones is more efficient for mapping large areas?
-Why?</p></li>
-<li><p>Estimate the maximum speed for required front (longitudinal)
-overlap. You are flying a drone that captures a photo every <strong>2.5
-seconds</strong>. At 80 meters altitude, the <strong>photo
-height</strong> (i.e., vertical ground coverage per image) is <strong>50
-meters</strong>. To ensure <strong>70% longitudinal overlap</strong>,
-what is the <strong>maximum drone speed</strong> you can fly while still
-achieving this overlap? Use the equation below.</p></li>
+<ol start="6" style="list-style-type: decimal">
+<li><strong>Question 6</strong> You are flying a drone that captures a
+photo every 2.5 seconds. At 80 meters altitude, the photo height (i.e.,
+vertical ground coverage per image) is 50 meters. To ensure 70%
+longitudinal overlap, what is the <strong>maximum drone speed</strong>
+you can fly while still achieving this overlap? Use the equation
+below.</li>
 </ol>
 <p><span class="math display">\[
 \text{Longitudinal Overlap (%)} = \left( \frac{\text{Photo Height} -
@@ -544,95 +607,98 @@ achieving this overlap? Use the equation below.</p></li>
 \right) \times 100
 \]</span></p>
 <ul>
-<li><strong>Photo Height</strong> is the vertical coverage of the image
-on the ground (in meters)</li>
-<li><strong>Speed</strong> is the ground speed of the drone (in meters
-per second)</li>
-<li><strong>Photo Interval</strong> is the time between image captures
-(in seconds)</li>
+<li><em>Photo Height</em> is the vertical coverage of the image on the
+ground (in meters)</li>
+<li><em>Speed</em> is the ground speed of the drone (in meters per
+second)</li>
+<li><em>Photo Interval</em> is the time between image captures (in
+seconds)</li>
 </ul>
-<ol start="5" style="list-style-type: decimal">
-<li><p>Calculate photo interval for a given speed and desired photo
-overlap: A fixed-wing drone flies at a <strong>constant speed of 12
-m/s</strong>. The image height on the ground (in the flight direction)
-is <strong>60 meters</strong>. What should the <strong>photo interval
-(seconds per image)</strong> be to maintain at least <strong>67% front
-overlap</strong>? Use the same equation as above.</p></li>
-<li><p>Estimating flight line spacing from lateral overlap: Your drone
-camera has a <strong>ground image width</strong> of <strong>120
-meters</strong> at the planned altitude. You are targeting <strong>75%
-lateral overlap</strong> for 3D reconstruction of terrain. How far apart
-should your <strong>parallel flight lines</strong> be? Use the equation
-below</p></li>
+<p><br /></p>
+<ol start="7" style="list-style-type: decimal">
+<li><strong>Question 7</strong> A fixed-wing drone flies at a constant
+speed of 12 m/s. The image height on the ground (in the flight
+direction) is 60 meters. What should the <strong>photo interval (seconds
+per image)</strong> be to maintain at least 67% front overlap? Use the
+same equation as above.</li>
+</ol>
+<p><br /></p>
+<ol start="8" style="list-style-type: decimal">
+<li><strong>Question 8</strong> Your drone camera has a ground image
+width of 120 meters at the planned altitude. You are targeting 75%
+lateral overlap for 3D reconstruction of terrain. How far apart should
+your <strong>parallel flight lines</strong> (flight line spacing) be?
+Use the equation below.</li>
 </ol>
 <p><span class="math display">\[
 \text{Lateral Overlap (%)} = \left( \frac{\text{Photo Width} - \text{Row
 Spacing}}{\text{Photo Width}} \right) \times 100
 \]</span></p>
 <ul>
-<li><strong>Photo Width</strong> is the ground coverage width of each
-image (in meters)</li>
-<li><strong>Row Spacing</strong> is the distance between adjacent flight
-lines (in meters)</li>
+<li><em>Photo Width</em> is the ground coverage width of each image (in
+meters)</li>
+<li><em>Row Spacing</em> is the distance between adjacent flight lines
+(in meters)</li>
 </ul>
-<ol start="7" style="list-style-type: decimal">
-<li>Consider altitude requirements for a target. You are using a drone
-camera with the following specs: Sensor width of 13.2 mm, Image width of
-4000 pixels, Focal length: 8.8 mm. You want to fly at an altitude that
-gives you a <strong>GSD of 2.5 cm/pixel</strong>. Estimate the
-<strong>altitude (in meters)</strong> required to achieve this GSD. GSD
-can also be calculated with the following equation, and pay attention to
-units:</li>
+<p><br /></p>
+<ol start="9" style="list-style-type: decimal">
+<li><strong>Question 9</strong> You are using a drone camera with the
+following specs: Sensor width of 13.2 mm, image width of 4000 pixels,
+and focal length of 8.8 mm. You want to fly at an altitude that gives
+you a GSD of 2.5 cm/pixel. Estimate the <strong>altitude (in
+meters)</strong> required to achieve this GSD. GSD can also be
+calculated with the following equation. <em>Pay attention to
+units.</em></li>
 </ol>
 <p><span class="math display">\[
 GSD = \frac{\text{Sensor Width (m)} \times H (masl)}{\text{Focal Length
 (m)} \times \text{Image Width (pixels)}}
 \]</span></p>
 <ul>
-<li>H is the flight altitude in meters</li>
-<li>Sensor Width and Focal Length (in meters)</li>
-<li>Image Width is the number of pixels in the image width
-dimension,</li>
+<li><em>H</em> is the flight altitude in meters</li>
 </ul>
-<ol start="8" style="list-style-type: decimal">
-<li>How many images are need to image a site? At 90 meters AGL, your
-drone’s image footprint on the ground has a Width of 120 meters and
-Height of 80 meters. You are mapping an area <strong>500 meters
-long</strong> (in the direction of flight) and <strong>300 meters
-wide</strong> (across flight lines). You want <strong>70% front
-overlap</strong> and <strong>65% lateral overlap</strong>.</li>
+<p><br /></p>
+<ol start="10" style="list-style-type: decimal">
+<li><strong>Question 10</strong> At 90 meters AGL, your drone’s image
+footprint on the ground has a Width of 120 meters and Height of 80
+meters. You are mapping an area 500 meters long (in the direction of
+flight) and 300 meters wide (across flight lines). You want 70% front
+overlap and 65% lateral overlap. How many <strong>images</strong> (total
+number) are needed to image this site? Use equations and information
+below to answer.</li>
 </ol>
-<p>Hint:</p>
-<ol style="list-style-type: decimal">
-<li>Spacing between images (front and side)</li>
-<li>Number of images needed in each direction</li>
-<li>Total number of images to cover the area</li>
-</ol>
-<hr />
-<p>[RESULTS] Table from above???</p>
-<p><strong>Answers:</strong></p>
-<ol style="list-style-type: decimal">
-<li></li>
-<li></li>
-<li></li>
-<li>6 m/s</li>
-<li>1.65 sec</li>
-<li>30 meters</li>
-<li>66.76 meters</li>
-<li>114 images (6 across and 19 along) (side space is 42m front space is
-24m)</li>
-<li></li>
-<li></li>
-</ol>
+<p>As a crude estimation, the distance length (L) or width (W) (in
+meters) can be used along with the overlap distance to estimate the
+number of images required:</p>
+<p><span class="math display">\[
+\text{Number of images} = \lceil
+\frac{Area~Length~(or~Width)}{\text{Spacing}} \rceil
+\]</span> The spacing relates to the equation in question five. For
+simplistic area estimations, you can multiply length and width based on
+the dimensions of your study area.</p>
+<p>However, a much better estimation would consider the actual image
+footprint on the ground in relation to the full area and include the
+first image rather than only spacing to estimate number of images.</p>
+<p>Instead, use the following equation to better estimate the total
+image count.</p>
+<p><span class="math display">\[
+\text{Number of Images}_{\text{direction 1}} = \left\lceil
+\frac{\text{Area Length} - \text{Image Length}}{\text{ Spacing}}
+\right\rceil + 1
+\]</span> Again, spacing relates to the equations in question 5.</p>
+<p><strong>Submit</strong> complete work to Canvas by the due date.</p>
+<p><br /> <br /> <br /></p>
 <hr />
 <div id="submission" class="section level3">
 <h3>Submission</h3>
 <ul>
-<li>Respond with answers to Canvas assignment (work for each must be
-submitted)</li>
-<li>All answers should be calculated using R or excel (show)</li>
+<li><strong>Respond with answers to Canvas assignment</strong> (work for
+each must be submitted)</li>
+<li>All answers should be calculated using R or excel (show)<br />
+<br />
+<em>Note parts of this lab were created in collaboration with OpenAI
+(2025)</em></li>
 </ul>
-<hr />
 </div>
 </div>
 
